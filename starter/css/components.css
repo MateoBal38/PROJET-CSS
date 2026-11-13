@@ -1,34 +1,763 @@
 /* ==========================================================================
    components.css — Layer « components »
-   Rôle : les COMPOSANTS réutilisables (bouton, carte, offre, item de FAQ…).
-   Un composant = un bloc de nesting. Convention de nommage à annoncer dans
-   le README (ex. BEM : .card, .card__title, .card--featured).
+   Rôle : les COMPOSANTS réutilisables (bouton, carte, offre, FAQ…).
+   Convention BEM : .bloc, .bloc__element, .bloc--variante.
+   Un composant = un bloc de nesting natif (≤ 3 niveaux).
+   NB : le nesting natif ne concatène pas les noms comme Sass
+   (&--ghost est invalide), les variantes s'écrivent donc à part.
+
+   Mouvement et prefers-reduced-motion (exigence 6) : tout ce qui
+   DÉPLACE un élément (translate, rotate, scale, @keyframes) est écrit
+   UNIQUEMENT dans @media (prefers-reduced-motion: no-preference).
+   Sans cette préférence, rien ne bouge et rien ne reste invisible :
+   les @keyframes ne définissent que leur état de départ (from), l'état
+   final est l'état normal de l'élément. Les transitions de couleur,
+   qui ne sont pas du mouvement, restent actives pour tous.
    ========================================================================== */
 
 @layer components {
-  /* Exemple de composant avec nesting natif (exigences 1 et 6) */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    border-radius: var(--radius-s);
-    background-color: var(--color-accent);
-    color: var(--color-surface);
-    text-decoration: none;
-    transition: translate var(--duration-fast) var(--ease-out);
+  /* ---------- Animations ------------------------------------------- */
 
-    &:hover {
-      translate: 0 -2px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      transition: none;
+  /* Apparition du hero et des réponses de FAQ : on n'anime que
+     opacity et translate (gérés par le compositeur, pas de recalcul
+     de mise en page). */
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      translate: 0 1.25rem;
     }
   }
 
-  /* TODO : .card (subgrid : grid-row: span N; grid-template-rows: subgrid;)
-     TODO : @container speakers (inline-size > 40rem) { .card { … } }
-     TODO : .offer et .offer:has(.offer__badge) (exigence 4)
-     TODO : .faq-item (details/summary), .nav, @keyframes… */
+  /* Apparition au défilement (bonus) : scale plutôt que translate, pour
+     ne pas entrer en conflit avec le translate du survol des cartes. */
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      scale: 0.94;
+    }
+  }
+
+  /* ---------- Lien d'évitement ------------------------------------- */
+
+  /* Premier élément focusable : permet au clavier de sauter l'en-tête.
+     Caché au-dessus de l'écran, il redescend quand il reçoit le focus. */
+  .skip-link {
+    position: absolute;
+    inset-block-start: var(--space-2);
+    inset-inline-start: var(--space-4);
+    z-index: 100;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-s);
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: 700;
+    translate: 0 -200%;
+
+    &:focus-visible {
+      translate: 0 0;
+    }
+  }
+
+  /* ---------- Logo ------------------------------------------------- */
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--font-size-h3);
+    font-weight: 700;
+    text-decoration: none;
+
+    & .logo__mark {
+      padding-inline: var(--space-2);
+      border-radius: var(--radius-s);
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-small);
+    }
+  }
+
+  /* ---------- Navigation ------------------------------------------- */
+
+  .nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .nav__link {
+    display: inline-block;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-control);
+    color: var(--color-text);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-out);
+
+    /* :is() factorise survol et focus clavier dans une seule règle */
+    &:is(:hover, :focus-visible) {
+      background-color: var(--color-accent-subtle);
+    }
+  }
+
+  /* ---------- Bascule de thème (Auto / Clair / Sombre) ------------- */
+
+  /* 3 vrais boutons radio : navigables aux flèches, annoncés par les
+     lecteurs d'écran. Le rond natif est masqué (.u-visually-hidden),
+     c'est le <label> qui est stylé. */
+  .theme-switch {
+    display: flex;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-control);
+  }
+
+  .theme-switch__option {
+    position: relative; /* contient le radio masqué en position absolue */
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-control);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+
+    &:hover {
+      background-color: var(--color-accent-subtle);
+    }
+
+    /* :has() : le label se stylise selon l'état du radio qu'il CONTIENT.
+       Sans :has(), il faudrait placer le radio avant le label et
+       utiliser input:checked + label. */
+    &:has(:checked) {
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+    }
+
+    /* Le radio est invisible : on reporte son focus sur le label */
+    &:has(:focus-visible) {
+      outline: 3px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  /* ---------- Bouton ----------------------------------------------- */
+
+  /* Les couleurs passent par des propriétés personnalisées LOCALES
+     (--btn-*) : une variante ou un contexte (offre mise en avant)
+     n'a qu'à changer ces variables, sans réécrire les déclarations. */
+  .btn {
+    --btn-bg: var(--color-accent);
+    --btn-fg: var(--color-on-accent);
+    --btn-border: var(--color-accent);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-block-size: 2.75rem; /* cible tactile confortable (44 px) */
+    padding: var(--space-2) var(--space-6);
+    border: 2px solid var(--btn-border);
+    border-radius: var(--radius-control);
+    background-color: var(--btn-bg);
+    color: var(--btn-fg);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-out);
+
+    &:hover {
+      --btn-bg: var(--color-accent-strong);
+      --btn-border: var(--color-accent-strong);
+    }
+
+    /* Transition n°1 (exigence 6) : léger soulèvement au survol */
+    @media (prefers-reduced-motion: no-preference) {
+      transition-property: background-color, border-color, color, translate;
+
+      &:hover {
+        translate: 0 -2px;
+      }
+    }
+  }
+
+  /* Variante secondaire : contour seul */
+  .btn--ghost {
+    --btn-bg: transparent;
+    --btn-fg: var(--color-accent);
+
+    &:hover {
+      --btn-bg: var(--color-accent-subtle);
+      --btn-fg: var(--color-text);
+      --btn-border: var(--color-accent);
+    }
+  }
+
+  /* ---------- Hero ------------------------------------------------- */
+
+  /* Décor « baseline grid » : une fine ligne tous les 1.5rem, comme la
+     grille de ligne de base d'un éditeur typographique. */
+  .hero {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--space-baseline) - 1px),
+      var(--color-grid-line) calc(var(--space-baseline) - 1px) var(--space-baseline)
+    );
+    border-block-end: 1px solid var(--color-border);
+
+    /* @keyframes (exigence 6) : texte, chiffres puis visuel apparaissent
+       en cascade, une seule fois au chargement. */
+    @media (prefers-reduced-motion: no-preference) {
+      & :is(.hero__intro, .hero__facts, .hero__visual) {
+        animation: rise-in var(--duration-slow) var(--ease-out) both;
+      }
+
+      & .hero__facts {
+        animation-delay: var(--delay-step);
+      }
+
+      & .hero__visual {
+        animation-delay: calc(2 * var(--delay-step));
+      }
+    }
+  }
+
+  .hero__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .hero__kicker {
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-s);
+    background-color: var(--color-highlight);
+    color: var(--color-on-highlight);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+  }
+
+  .hero__title-accent {
+    color: var(--color-accent);
+  }
+
+  .hero__meta {
+    font-size: var(--font-size-lead);
+    font-weight: 600;
+  }
+
+  .hero__pitch {
+    max-inline-size: 38ch;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lead);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .hero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+
+    & > li {
+      flex: 1 1 8rem;
+      padding-inline-start: var(--space-3);
+      border-inline-start: 3px solid var(--color-accent);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-small);
+    }
+
+    & strong {
+      display: block;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: var(--font-size-h2);
+      line-height: 1.1;
+    }
+  }
+
+  /* ---------- Fenêtre de code (visuel décoratif du hero) ----------- */
+
+  .code-window {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-l);
+    background-color: var(--color-code-bg);
+    color: var(--color-code-text);
+    box-shadow: 0 1.5rem 3rem -1rem var(--color-shadow);
+
+    & .code-window__bar {
+      display: flex;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      border-block-end: 1px solid color-mix(in oklch, var(--color-code-muted) 30%, transparent);
+    }
+
+    & .code-window__dot {
+      inline-size: 0.75rem;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background-color: var(--color-code-muted);
+    }
+
+    /* pre-wrap : le code passe à la ligne plutôt que de déborder à 320 px */
+    & .code-window__code {
+      padding: var(--space-6) var(--space-5);
+      font-size: var(--font-size-small);
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+  }
+
+  .code-window__comment {
+    color: var(--color-code-muted);
+  }
+
+  .code-window__selector {
+    color: var(--color-code-selector);
+  }
+
+  .code-window__property {
+    color: var(--color-code-property);
+  }
+
+  .code-window__value {
+    color: var(--color-code-value);
+  }
+
+  /* ---------- En-tête de section ----------------------------------- */
+
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-inline-size: 46rem;
+    margin-block-end: var(--space-8);
+
+    & .section-head__kicker {
+      color: var(--color-accent);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-small);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    & .section-head__lead {
+      color: var(--color-text-muted);
+    }
+  }
+
+  /* Dans les grilles programme et FAQ, c'est le gap qui espace */
+  :is(.programme, .faq) > .section-head {
+    margin-block-end: 0;
+  }
+
+  /* ---------- Journée de programme --------------------------------- */
+
+  /* Une journée est un conteneur nommé « day » : ses créneaux
+     s'organisent selon la largeur de la COLONNE, pas de l'écran. */
+  .day {
+    container: day / inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    & .day__title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-1) var(--space-3);
+    }
+
+    & .day__date {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-small);
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+  }
+
+  /* Liste des créneaux : colonnes « heure | contenu » (étroit) puis
+     « heure | contenu | salle » quand la colonne dépasse 28rem. */
+  .day__slots {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-4);
+    border-block-start: 1px solid var(--color-border);
+
+    @container day (inline-size >= 28rem) {
+      grid-template-columns: auto 1fr auto;
+    }
+  }
+
+  /* Créneau = subgrid des COLONNES de la liste : toutes les heures, tous
+     les titres et toutes les salles tombent dans les mêmes colonnes, la
+     colonne « salle » prend la largeur de la plus longue. */
+  .slot {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    row-gap: var(--space-1);
+    align-items: baseline;
+    padding: var(--space-4) var(--space-2);
+    border-block-end: 1px solid var(--color-border);
+    transition: background-color var(--duration-base) var(--ease-out);
+
+    & .slot__time {
+      color: var(--color-accent);
+      font-size: var(--font-size-small);
+      font-weight: 600;
+    }
+
+    & :is(.slot__speaker, .slot__room) {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-small);
+    }
+
+    & .slot__room {
+      grid-column: 2;
+      font-family: var(--font-mono);
+
+      @container day (inline-size >= 28rem) {
+        grid-column: 3;
+        justify-self: end;
+      }
+    }
+
+    /* Le créneau ciblé par un lien « Voir le talk » (#talk-…) est
+       surligné : l'œil le retrouve tout de suite. */
+    &:target {
+      background-color: var(--color-accent-subtle);
+    }
+  }
+
+  .slot--break .slot__title {
+    color: var(--color-text-muted);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .slot__tag {
+    display: inline-block;
+    margin-inline-end: var(--space-2);
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-s);
+    background-color: var(--color-highlight);
+    color: var(--color-on-highlight);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  /* ---------- Carte intervenant (exigence 2 : subgrid) ------------- */
+
+  /* La carte occupe les 4 lignes transmises par son <li> (layout.css)
+     et les réutilise : image / en-tête / bio / lien sont alignés d'une
+     carte à l'autre. row-gap remplace l'espacement du parent à
+     l'intérieur de la carte. */
+  .card {
+    grid-row: span 4;
+    display: grid;
+    grid-template-rows: subgrid;
+    row-gap: var(--space-3);
+    padding: var(--space-4) var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface-raised);
+    transition: border-color var(--duration-fast) var(--ease-out);
+
+    /* :has(:focus-visible) : la carte réagit aussi quand son lien a le
+       focus clavier, pas seulement au survol souris. */
+    &:hover,
+    &:has(:focus-visible) {
+      border-color: var(--color-accent);
+    }
+
+    /* Transition n°2 (exigence 6) : la carte se soulève */
+    @media (prefers-reduced-motion: no-preference) {
+      transition-property: border-color, translate;
+
+      &:hover,
+      &:has(:focus-visible) {
+        translate: 0 -4px;
+      }
+    }
+
+    & .card__media {
+      inline-size: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: calc(var(--radius-card) - var(--space-1));
+      background-color: var(--color-surface-alt);
+    }
+
+    & .card__header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      margin-block-start: var(--space-2);
+    }
+
+    & .card__role {
+      color: var(--color-accent);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-small);
+    }
+
+    & .card__bio {
+      color: var(--color-text-muted);
+    }
+
+    & .card__link {
+      align-self: end;
+      font-weight: 600;
+    }
+  }
+
+  /* ---------- Offre de billetterie --------------------------------- */
+
+  /* Exigence 3 : composant piloté par la container query « offer ».
+     Étroit (cellule de grille) : empilé. Large (bandeau ≥ 40rem) :
+     3 colonnes nom/prix | avantages | bouton. */
+  .offer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    block-size: 100%;
+    padding: var(--space-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface-raised);
+
+    & .offer__price {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-2);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-small);
+    }
+
+    & .offer__amount {
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: var(--font-size-h2);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    & .offer__features {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    /* Le bouton est poussé en bas : tous les boutons d'une rangée
+       sont alignés, quelle que soit la longueur de la liste. */
+    & .offer__cta {
+      margin-block-start: auto;
+    }
+
+    @container offer (inline-size >= 40rem) {
+      display: grid;
+      grid-template-columns: minmax(12rem, 1fr) 2fr auto;
+      grid-template-areas:
+        "nom avantages action"
+        "prix avantages action";
+      align-items: center;
+      gap: var(--space-2) var(--space-8);
+
+      & .offer__name {
+        grid-area: nom;
+      }
+
+      & .offer__price {
+        grid-area: prix;
+      }
+
+      & .offer__features {
+        grid-area: avantages;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      & .offer__cta {
+        grid-area: action;
+        margin-block-start: 0;
+      }
+    }
+  }
+
+  /* Avantage de l'offre, précédé d'une coche dessinée en CSS (aucun
+     caractère lu par les lecteurs d'écran). */
+  .offer__feature {
+    display: flex;
+    gap: var(--space-3);
+
+    &::before {
+      content: "";
+      flex: none;
+      inline-size: 0.45em;
+      block-size: 0.9em;
+      margin-block-start: 0.25em;
+      margin-inline-start: 0.2em;
+      border: solid var(--color-accent);
+      border-width: 0 2px 2px 0;
+      rotate: 45deg;
+    }
+  }
+
+  .offer__badge {
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-control);
+    background-color: var(--color-highlight);
+    color: var(--color-on-highlight);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+  }
+
+  /* Exigence 4 — :has() : l'offre qui CONTIENT un badge est mise en
+     avant automatiquement (bordure, ombre, bouton plein). Déplacer le
+     badge dans le HTML suffit à changer d'offre vedette. */
+  .offer:has(.offer__badge) {
+    border: 2px solid var(--color-accent);
+    box-shadow: 0 1.25rem 2.5rem -1.25rem var(--color-shadow);
+
+    & .btn--ghost {
+      --btn-bg: var(--color-accent);
+      --btn-fg: var(--color-on-accent);
+
+      &:hover {
+        --btn-bg: var(--color-accent-strong);
+        --btn-border: var(--color-accent-strong);
+      }
+    }
+  }
+
+  .tickets__note {
+    margin-block-start: var(--space-6);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+  }
+
+  /* ---------- Question de FAQ (details / summary) ------------------ */
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-m);
+    background-color: var(--color-surface-raised);
+    transition: border-color var(--duration-fast) var(--ease-out);
+
+    &[open] {
+      border-color: var(--color-accent);
+    }
+
+    & .faq-item__question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      border-radius: inherit;
+      font-weight: 600;
+      list-style: none; /* retire le triangle natif */
+
+      /* Signe « + » dessiné avec 2 dégradés ; il pivote en « × » */
+      &::after {
+        content: "";
+        flex: none;
+        inline-size: 1rem;
+        aspect-ratio: 1;
+        background:
+          linear-gradient(var(--color-accent) 0 0) center / 100% 2px no-repeat,
+          linear-gradient(var(--color-accent) 0 0) center / 2px 100% no-repeat;
+      }
+    }
+
+    &[open] .faq-item__question::after {
+      rotate: 45deg;
+    }
+
+    & .faq-item__answer {
+      padding: 0 var(--space-5) var(--space-5);
+      color: var(--color-text-muted);
+    }
+
+    /* Transition n°3 (rotation du +) et @keyframes à l'ouverture */
+    @media (prefers-reduced-motion: no-preference) {
+      & .faq-item__question::after {
+        transition: rotate var(--duration-base) var(--ease-out);
+      }
+
+      &[open] .faq-item__answer {
+        animation: rise-in var(--duration-base) var(--ease-out);
+      }
+    }
+  }
+
+  /* Ancien Safari : le triangle natif est un pseudo-élément préfixé */
+  .faq-item__question::-webkit-details-marker {
+    display: none;
+  }
+
+  /* ---------- Footer ----------------------------------------------- */
+
+  .site-footer {
+    font-size: var(--font-size-small);
+
+    & .site-footer__title {
+      margin-block-end: var(--space-3);
+      font-size: var(--font-size-body);
+    }
+
+    & .site-footer__links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    & .site-footer__bottom {
+      padding-block-start: var(--space-6);
+      border-block-start: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+    }
+  }
+
+  .site-footer__tagline {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Bonus : animation pilotée par le défilement ---------- */
+
+  /* Cartes et offres apparaissent en entrant dans la fenêtre.
+     @supports : Firefox ne gère pas animation-timeline ; il ignore tout
+     le bloc et affiche les éléments normalement (aucun opacity: 0 fixé
+     hors de l'animation). animation-timeline est écrit APRÈS le
+     raccourci animation, qui le réinitialiserait sinon. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      :is(.card, .offer) {
+        animation: reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 30%;
+      }
+    }
+  }
 }

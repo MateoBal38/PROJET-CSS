@@ -1,13 +1,16 @@
 /* ==========================================================================
    utilities.css — Layer « utilities »
    Rôle : petites classes à UN seul usage (préfixe u-). Ce layer étant le
-   dernier déclaré, ses règles l'emportent sur tous les autres SANS
-   !important (exigence 8).
+   dernier déclaré dans main.css, ses règles l'emportent sur tous les
+   autres SANS !important (exigence 8) : par exemple .u-visually-hidden
+   gagne sur .theme-switch__option input, même si ce dernier sélecteur
+   était plus spécifique.
    ========================================================================== */
 
 @layer utilities {
   /* Masque visuellement un élément tout en le laissant lisible par les
-     lecteurs d'écran (ex. libellé de la bascule de thème). */
+     lecteurs d'écran et focusable (radios de la bascule de thème,
+     complément des liens « Voir le talk »). */
   .u-visually-hidden {
     position: absolute;
     inline-size: 1px;
@@ -16,6 +19,4 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
-
-  /* TODO : .u-text-center, .u-stack… (uniquement si vraiment utiles) */
 }

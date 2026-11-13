@@ -2,11 +2,28 @@
    base.css — Layer « base »
    Rôle : styles par défaut des ÉLÉMENTS HTML (body, titres, liens, focus…).
    Pas de classes ici : seulement des sélecteurs d'éléments, :where(), :is().
-   N'utilisez que des tokens SÉMANTIQUES.
+   N'utilise que des tokens SÉMANTIQUES.
    ========================================================================== */
 
 @layer base {
+  html {
+    accent-color: var(--color-accent);
+
+    /* Défilement doux vers les ancres, uniquement si l'utilisateur
+       n'a pas demandé à réduire les animations (exigence 6). */
+    @media (prefers-reduced-motion: no-preference) {
+      scroll-behavior: smooth;
+    }
+
+    /* À partir de 60rem l'en-tête devient collant : on réserve sa hauteur
+       pour que la cible d'une ancre ne passe pas dessous. */
+    @media (width >= 60rem) {
+      scroll-padding-block-start: var(--space-header);
+    }
+  }
+
   body {
+    min-block-size: 100dvh;
     background-color: var(--color-surface);
     color: var(--color-text);
     font-family: var(--font-sans);
@@ -14,28 +31,69 @@
     line-height: 1.6;
   }
 
-  h1 {
-    font-size: var(--font-size-h1);
-    line-height: 1.1;
+  /* :where() : spécificité nulle (0,0,0) → n'importe quelle classe de
+     components.css peut changer la police ou l'interlignage d'un titre
+     sans surenchère de spécificité (exigence 4). */
+  :where(h1, h2, h3, h4) {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
-  /* Exemple de :where() : spécificité nulle, facile à surcharger (exigence 4) */
-  :where(h1, h2, h3) {
-    text-wrap: balance;
+  h1 {
+    font-size: var(--font-size-h1);
+    line-height: 1;
+  }
+
+  h2 {
+    font-size: var(--font-size-h2);
+  }
+
+  h3 {
+    font-size: var(--font-size-h3);
+  }
+
+  h4 {
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  /* Évite les mots orphelins en fin de paragraphe */
+  p {
+    text-wrap: pretty;
   }
 
   a {
     color: var(--color-accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+
+    &:hover {
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  :where(code, pre, kbd, time) {
+    font-family: var(--font-mono);
+  }
+
+  :where(button, summary, label) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background-color: var(--color-highlight);
+    color: var(--color-on-highlight);
   }
 
   /* Exigence 7 : un focus TOUJOURS visible au clavier.
-     Ne jamais supprimer l'outline sans le remplacer. */
+     :focus-visible plutôt que :focus : l'anneau n'apparaît pas au clic
+     souris, mais toujours au clavier. */
   :focus-visible {
     outline: 3px solid var(--color-focus);
     outline-offset: 3px;
   }
-
-  /* TODO : h2, h3, listes, boutons natifs, ::selection…
-     TODO (exigence 6) : neutraliser les mouvements globalement si besoin :
-     @media (prefers-reduced-motion: reduce) { … } */
 }

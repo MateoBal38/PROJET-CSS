@@ -1,80 +1,152 @@
 /* ==========================================================================
    tokens.css — Design tokens (rangés dans le layer « base »)
    --------------------------------------------------------------------------
+   Identité « Baseline Conf » : éditorial technique, encre + papier,
+   un bleu électrique en accent et un vert citron pour surligner.
+
    Deux niveaux :
-   1. PRIMITIFS : valeurs brutes (palette, échelles). Nommés d'après ce
-      qu'ils SONT : --color-violet-600, --space-4…
-      → jamais utilisés directement dans les composants.
-   2. SÉMANTIQUES : rôles. Nommés d'après ce qu'ils FONT : --color-surface,
-      --color-accent, --space-section…
-      → les seuls utilisés dans layout.css et components.css.
-   Changer de thème = modifier les sémantiques, pas les composants.
-   Les valeurs ci-dessous sont des EXEMPLES : remplacez-les par l'identité
-   de votre événement (exigence 1).
+   1. PRIMITIFS : valeurs brutes, nommées d'après ce qu'elles SONT
+      (--color-ink-950, --space-4…). Jamais utilisées dans layout.css ni
+      components.css.
+   2. SÉMANTIQUES : rôles, nommés d'après ce qu'ils FONT
+      (--color-surface, --color-accent, --space-section…). Les seuls
+      utilisés par les autres fichiers.
+   Changer de thème ou de marque = modifier les sémantiques (ou les
+   primitifs), sans toucher à un seul composant.
+
+   Contrastes : toutes les paires texte/fond sémantiques ont été calculées
+   (script oklch → sRGB → ratio WCAG) dans les DEUX thèmes, voir README.
    ========================================================================== */
 
 @layer base {
   :root {
     /* ---------- 1. Primitifs ---------------------------------------- */
 
-    /* Palette (oklch : L = luminosité perçue, C = chroma, H = teinte) */
-    --color-sand-50: oklch(98% 0.01 85);
-    --color-sand-200: oklch(90% 0.03 85);
-    --color-night-900: oklch(20% 0.03 280);
-    --color-night-700: oklch(32% 0.04 280);
-    --color-violet-300: oklch(78% 0.12 300);
-    --color-violet-600: oklch(50% 0.2 300);
-    /* TODO : ajouter les teintes de votre palette (accent 2, succès, erreur…) */
+    /* Palette en oklch(L C H) : L = luminosité PERÇUE, ce qui permet de
+       construire une rampe régulière (950 → 50) en ne faisant varier que L. */
+    --color-white: oklch(100% 0 0);
+    --color-paper-50: oklch(98.5% 0.006 95);
+    --color-paper-100: oklch(95.5% 0.012 95);
 
-    /* Échelle d'espacements (base 0.25rem) */
+    --color-ink-200: oklch(88% 0.012 265);
+    --color-ink-300: oklch(76% 0.02 265);
+    --color-ink-600: oklch(45% 0.03 265);
+    --color-ink-700: oklch(36% 0.03 265);
+    --color-ink-800: oklch(27% 0.03 265);
+    --color-ink-900: oklch(21% 0.025 265);
+    --color-ink-950: oklch(16% 0.02 265);
+
+    --color-blue-100: oklch(94% 0.022 264);
+    --color-blue-200: oklch(86% 0.055 264);
+    --color-blue-300: oklch(78% 0.11 264);
+    --color-blue-600: oklch(50% 0.21 264);
+    --color-blue-700: oklch(43% 0.2 264);
+    --color-blue-900: oklch(30% 0.09 264);
+
+    --color-lime-300: oklch(89% 0.19 125);
+    --color-coral-300: oklch(80% 0.11 40);
+
+    /* Échelle d'espacements (base 0.25rem = 4 px) */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
     --space-3: 0.75rem;
     --space-4: 1rem;
+    --space-5: 1.25rem;
     --space-6: 1.5rem;
     --space-8: 2rem;
     --space-12: 3rem;
+    --space-16: 4rem;
+    --space-24: 6rem;
 
-    /* Rayons, durées, courbes */
+    /* Rayons */
     --radius-s: 0.25rem;
     --radius-m: 0.75rem;
+    --radius-l: 1.25rem;
+    --radius-pill: 999px;
+
+    /* Durées et courbes */
     --duration-fast: 150ms;
     --duration-base: 300ms;
+    --duration-slow: 700ms;
     --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-    /* Typographie */
-    --font-sans: system-ui, sans-serif;
-    /* TODO : police de titre (Google Fonts via <link> dans index.html) */
+    /* Familles (Google Fonts chargées dans index.html, avec replis système) */
+    --font-family-grotesk: "Space Grotesk", system-ui, sans-serif;
+    --font-family-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+    --font-family-system: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
     /* ---------- 2. Sémantiques -------------------------------------- */
 
-    /* Indispensable pour que light-dark() bascule et que les éléments
-       natifs (champs, barres de défilement) suivent le thème. */
+    /* Indispensable : sans color-scheme, light-dark() renvoie toujours la
+       1re valeur, et les éléments natifs (radios, barres de défilement)
+       ne suivent pas le thème. « light dark » = suit la préférence OS. */
     color-scheme: light dark;
 
     /* light-dark(valeur en thème clair, valeur en thème sombre) */
-    --color-surface: light-dark(var(--color-sand-50), var(--color-night-900));
-    --color-surface-raised: light-dark(white, var(--color-night-700));
-    --color-text: light-dark(var(--color-night-900), var(--color-sand-50));
-    --color-accent: light-dark(var(--color-violet-600), var(--color-violet-300));
-    --color-focus: var(--color-accent);
-    /* TODO : --color-text-muted, --color-border, --color-on-accent…
-       (vérifier les contrastes AA dans les DEUX thèmes) */
+    --color-surface: light-dark(var(--color-paper-50), var(--color-ink-950));
+    --color-surface-alt: light-dark(var(--color-paper-100), var(--color-ink-900));
+    --color-surface-raised: light-dark(var(--color-white), var(--color-ink-800));
+    --color-text: light-dark(var(--color-ink-950), var(--color-paper-50));
+    --color-text-muted: light-dark(var(--color-ink-600), var(--color-ink-300));
+    --color-border: light-dark(var(--color-ink-200), var(--color-ink-700));
+    --color-border-strong: light-dark(var(--color-ink-600), var(--color-ink-300));
+    --color-accent: light-dark(var(--color-blue-600), var(--color-blue-300));
+    --color-accent-strong: light-dark(var(--color-blue-700), var(--color-blue-200));
+    --color-accent-subtle: light-dark(var(--color-blue-100), var(--color-blue-900));
+    --color-on-accent: light-dark(var(--color-paper-50), var(--color-ink-950));
+    --color-highlight: var(--color-lime-300);
+    --color-on-highlight: var(--color-ink-950);
+    /* Anneau de focus : bleu sur papier, citron sur encre (> 3:1 partout) */
+    --color-focus: light-dark(var(--color-blue-600), var(--color-lime-300));
+    /* color-mix : version transparente de l'accent, pour les décors */
+    --color-grid-line: color-mix(in oklch, var(--color-accent) 14%, transparent);
+    --color-shadow: light-dark(oklch(20% 0.03 265 / 0.14), oklch(0% 0 0 / 0.55));
 
-    /* Typographie fluide : clamp(minimum, valeur préférée, maximum) */
+    /* Fenêtre de code du hero : toujours « éditeur sombre », dans les 2 thèmes */
+    --color-code-bg: var(--color-ink-900);
+    --color-code-text: var(--color-paper-100);
+    --color-code-muted: var(--color-ink-300);
+    --color-code-selector: var(--color-lime-300);
+    --color-code-property: var(--color-blue-300);
+    --color-code-value: var(--color-coral-300);
+
+    /* Typographie */
+    --font-display: var(--font-family-grotesk);
+    --font-mono: var(--font-family-mono);
+    --font-sans: var(--font-family-system);
+
+    /* Typographie fluide : clamp(minimum, valeur préférée, maximum).
+       La part en rem respecte le zoom navigateur, la part en vw fait
+       grandir le texte avec la fenêtre. */
+    --font-size-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
     --font-size-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-    --font-size-h1: clamp(2.25rem, 1.5rem + 4vw, 4.5rem);
-    /* TODO : --font-size-h2, --font-size-h3 */
+    --font-size-lead: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+    --font-size-h3: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    --font-size-h2: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+    --font-size-h1: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
 
-    --space-section: clamp(var(--space-8), 5vw, var(--space-12));
+    /* Espacements par rôle */
+    --space-gutter: var(--space-4);
+    --space-section: clamp(var(--space-12), 8vw, var(--space-24));
+    --space-card: clamp(var(--space-4), 3vw, var(--space-6));
+    --space-baseline: var(--space-6); /* pas de la grille décorative du hero */
+    --space-header: 5rem; /* hauteur réservée sous l'en-tête collant */
+
+    --size-content: 72rem;
     --radius-card: var(--radius-m);
-    /* TODO : --duration-hover, --space-card… */
+    --radius-control: var(--radius-pill);
+    --delay-step: 120ms; /* décalage entre éléments animés en cascade */
   }
 
-  /* BONUS TECHNIQUE (exigence 5) — bascule CSS-only, à décommenter si vous ajoutez
-     <input type="checkbox" id="theme-toggle"> dans le header :
-  :root:has(#theme-toggle:checked) {
+  /* BONUS TECHNIQUE (exigence 5) — bascule de thème 100 % CSS.
+     Les 3 boutons radio du header (Auto / Clair / Sombre) changent
+     color-scheme sur :root : TOUS les light-dark() basculent d'un coup.
+     « Auto » ne fait rien : on garde « light dark » (préférence OS). */
+  :root:has(#theme-light:checked) {
+    color-scheme: light;
+  }
+
+  :root:has(#theme-dark:checked) {
     color-scheme: dark;
   }
-  */
 }

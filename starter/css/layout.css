@@ -1,15 +1,21 @@
 /* ==========================================================================
    layout.css — Layer « layout »
    Rôle : la MISE EN PAGE (conteneurs, grilles de sections, en-tête, footer).
-   Les composants (cartes, boutons…) vont dans components.css.
-   Mobile-first : styles de base pour 320 px, puis media queries en
-   (width >= …) pour élargir (exigence 3).
+   L'apparence des composants (cartes, boutons…) est dans components.css.
+   Mobile-first : les styles de base visent 320 px, puis des media queries
+   en (width >= …) élargissent la mise en page (exigence 3).
+   Choix Grid / Flexbox : Grid pour les structures en 2 dimensions
+   (sections, grilles de cartes), Flexbox pour les rangées d'éléments
+   dont le contenu dicte la taille (en-tête, footer).
    ========================================================================== */
 
 @layer layout {
-  /* Conteneur centré à largeur maximale */
+  /* ---------- Conteneurs ------------------------------------------- */
+
+  /* Largeur max 72rem, et toujours une gouttière de chaque côté :
+     min() évite toute media query pour ce cas. */
   .container {
-    inline-size: min(100% - 2 * var(--space-4), 72rem);
+    inline-size: min(100% - 2 * var(--space-gutter), var(--size-content));
     margin-inline: auto;
   }
 
@@ -17,11 +23,95 @@
     padding-block: var(--space-section);
   }
 
-  /* Exigence 2 — grille à zones nommées (exemple à adapter : programme)
-     Mobile : une colonne. Desktop : deux jours côte à côte. */
+  /* Bandeau de fond alterné, pour rythmer la page */
+  .section--alt {
+    background-color: var(--color-surface-alt);
+    border-block: 1px solid var(--color-border);
+  }
+
+  /* ---------- En-tête ---------------------------------------------- */
+
+  .site-header {
+    background-color: var(--color-surface);
+    border-block-end: 1px solid var(--color-border);
+
+    /* Collant seulement sur grand écran : sur mobile, il prendrait
+       trop de hauteur sur le contenu. */
+    @media (width >= 60rem) {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 10;
+    }
+  }
+
+  /* Flexbox + wrap : logo et bascule de thème sur une ligne, la
+     navigation passe dessous (order) tant que la place manque. */
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-6);
+    padding-block: var(--space-3);
+
+    & > .nav {
+      order: 3;
+      flex-basis: 100%;
+    }
+
+    @media (width >= 60rem) {
+      & > .nav {
+        order: 0;
+        flex-basis: auto;
+        margin-inline-start: auto;
+      }
+    }
+  }
+
+  /* ---------- Hero (exigence 2 : grid-template-areas) -------------- */
+
+  /* Mobile : texte, chiffres clés, puis visuel, empilés.
+     Desktop : le visuel occupe toute la colonne de droite (zone
+     « visuel » sur 2 lignes). Seules les déclarations de la grille
+     changent : les enfants gardent leur grid-area. */
+  .hero__inner {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: var(--space-section);
+    grid-template-areas:
+      "texte"
+      "faits"
+      "visuel";
+
+    @media (width >= 56rem) {
+      grid-template-columns: 1.2fr 1fr;
+      grid-template-areas:
+        "texte visuel"
+        "faits visuel";
+      align-items: center;
+      column-gap: var(--space-12);
+    }
+
+    & > .hero__intro {
+      grid-area: texte;
+    }
+
+    & > .hero__facts {
+      grid-area: faits;
+    }
+
+    & > .hero__visual {
+      grid-area: visuel;
+    }
+  }
+
+  /* ---------- Programme (exigence 2 : grid-template-areas) --------- */
+
+  /* Mobile : une colonne. Desktop : les deux jours côte à côte, le
+     titre de section sur toute la largeur. */
   .programme {
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-8);
     grid-template-areas:
       "titre"
       "jour1"
@@ -34,15 +124,106 @@
         "jour1 jour2";
     }
 
-    /* Chaque enfant se place dans sa zone nommée */
-    & > h2 {
+    & > .section-head {
       grid-area: titre;
     }
-    /* TODO : placer les blocs des jours dans "jour1" et "jour2" */
+
+    & > .programme__jour1 {
+      grid-area: jour1;
+    }
+
+    & > .programme__jour2 {
+      grid-area: jour2;
+    }
   }
 
-  /* TODO : .site-header (Flexbox), .hero, grille des intervenants
-     (ex. repeat(auto-fit, minmax(16rem, 1fr))), billetterie, footer.
-     TODO (exigence 3) : déclarer le conteneur de votre container query,
-     ex. .speakers { container: speakers / inline-size; } */
+  /* ---------- Intervenants (exigence 2 : subgrid) ------------------ */
+
+  /* Autant de colonnes de 18rem minimum que possible (3 sur desktop).
+     min(100%, 18rem) : à 320 px, une colonne ne dépasse jamais l'écran. */
+  .speakers__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-8) var(--space-6);
+  }
+
+  /* Chaque <li> couvre 4 lignes de la grille parente et les transmet à
+     sa carte (grid-template-rows: subgrid) : image, en-tête, bio et lien
+     de toutes les cartes d'une même rangée partagent les mêmes lignes,
+     donc restent alignés même si une bio est plus longue.
+     La carte elle-même (components.css) est aussi un subgrid. */
+  .speakers__item {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+  }
+
+  /* ---------- Billetterie (exigence 3 : contextes de la CQ) -------- */
+
+  .tickets__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--space-6);
+  }
+
+  /* Les DEUX contextes de la container query « offer » :
+     - .tickets__item : une cellule de la grille (≈ 23rem en desktop) ;
+     - .tickets__extra : un bandeau pleine largeur (≈ 72rem en desktop).
+     :is() factorise les deux sélecteurs en une seule règle. */
+  :is(.tickets__item, .tickets__extra) {
+    container: offer / inline-size;
+  }
+
+  .tickets__extra {
+    margin-block-start: var(--space-8);
+  }
+
+  /* ---------- FAQ -------------------------------------------------- */
+
+  .faq {
+    display: grid;
+    gap: var(--space-8);
+
+    /* Desktop : titre à gauche (qui reste visible au défilement),
+       questions à droite. minmax(0, …) autorise les colonnes à
+       rétrécir sous la largeur de leur contenu. */
+    @media (width >= 60rem) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      align-items: start;
+
+      & > .section-head {
+        position: sticky;
+        inset-block-start: calc(var(--space-header) + var(--space-4));
+      }
+    }
+  }
+
+  .faq__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* ---------- Footer ----------------------------------------------- */
+
+  .site-footer {
+    background-color: var(--color-surface-alt);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  /* flex: 1 1 14rem = peut grandir (1), peut rétrécir (1), base 14rem :
+     4 colonnes sur desktop, qui se replient d'elles-mêmes sur mobile. */
+  .site-footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8) var(--space-12);
+    padding-block: var(--space-12) var(--space-8);
+
+    & > .site-footer__col {
+      flex: 1 1 14rem;
+    }
+
+    & > .site-footer__bottom {
+      flex-basis: 100%;
+    }
+  }
 }

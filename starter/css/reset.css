@@ -2,9 +2,8 @@
    reset.css — Layer « reset »
    Rôle : neutraliser les différences entre navigateurs. Rien de spécifique
    au projet ici (pas de couleur, pas de police).
-   Astuce : :where() donne une spécificité nulle → tout le reste gagne
-   facilement, même dans un layer précédent… mais ici c'est l'ordre des
-   layers qui fait déjà le travail.
+   :where() donne une spécificité nulle : n'importe quelle règle des
+   layers suivants l'emporte sans effort.
    ========================================================================== */
 
 @layer reset {
@@ -14,10 +13,13 @@
     box-sizing: border-box;
   }
 
-  :where(body, h1, h2, h3, h4, p, figure, blockquote, dl, dd) {
+  :where(body, h1, h2, h3, h4, p, figure, blockquote, dl, dd, pre) {
     margin: 0;
   }
 
+  /* Les listes marquées role="list" sont des listes « de mise en page » :
+     on retire puces et retraits (role="list" conserve la sémantique dans
+     Safari, qui la retire sinon avec list-style: none). */
   :where(ul, ol)[role="list"] {
     list-style: none;
     padding: 0;
@@ -34,5 +36,23 @@
     font: inherit;
   }
 
-  /* TODO : compléter si besoin (ex. text-size-adjust, overflow-wrap…). */
+  /* Un fieldset a par défaut min-inline-size: min-content : il refuse de
+     rétrécir sous la largeur de son contenu et peut créer un défilement
+     horizontal à 320 px. */
+  :where(fieldset) {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* Les mots très longs (URL, adresse e-mail) passent à la ligne au lieu
+     de déborder de leur conteneur. */
+  :where(p, li, h1, h2, h3, h4, a, dd) {
+    overflow-wrap: break-word;
+  }
+
+  :where(address) {
+    font-style: normal;
+  }
 }

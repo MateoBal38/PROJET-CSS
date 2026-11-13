@@ -3,115 +3,477 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- TODO : nom de votre événement -->
-  <title>NOM DE L'ÉVÉNEMENT — Projet noté — Site vitrine d'un événement</title>
-  <meta name="description" content="TODO : une phrase qui présente l'événement.">
+  <title>Baseline Conf 2027 — La conférence CSS à Lyon, 18 et 19 mars</title>
+  <meta name="description" content="Baseline Conf : deux jours de talks et d'ateliers sur le CSS moderne, l'accessibilité et les design systems, les 18 et 19 mars 2027 à Lyon.">
+  <!-- Le navigateur peint directement le bon fond, avant même le CSS -->
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 
-  <!-- Polices (facultatif) : Google Fonts autorisé via <link>, ex.
+  <!-- 2 familles Google Fonts (crédits dans le footer) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=...&display=swap">
-  -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
 
   <!-- Un SEUL fichier CSS lié : main.css déclare l'ordre des layers et importe le reste -->
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
 
-  <!-- ============================================================
-       EN-TÊTE : logo/nom + navigation vers les sections (ancres)
-       Flexbox (exigence 2). Menu mobile sans JS : Popover API,
-       <details> ou case à cocher + :has().
-       BONUS TECHNIQUE (exigence 5) : bascule de thème CSS-only, ex.
-       <label><input type="checkbox" id="theme-toggle"> Thème sombre</label>
-       ============================================================ -->
-  <header class="site-header">
-    <a href="#top" class="site-header__logo">NOM DE L'ÉVÉNEMENT</a>
-    <nav aria-label="Navigation principale">
-      <ul role="list">
-        <li><a href="#programme">Programme</a></li>
-        <li><a href="#intervenants">Intervenants</a></li>
-        <li><a href="#billetterie">Billetterie</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-    </nav>
+  <!-- ============================ EN-TÊTE ============================ -->
+  <header class="site-header" id="top">
+    <div class="container site-header__inner">
+      <a href="#top" class="logo"><span class="logo__mark" aria-hidden="true">{b}</span> Baseline Conf</a>
+
+      <nav class="nav" aria-label="Navigation principale">
+        <ul class="nav__list" role="list">
+          <li><a class="nav__link" href="#programme">Programme</a></li>
+          <li><a class="nav__link" href="#intervenants">Intervenants</a></li>
+          <li><a class="nav__link" href="#billetterie">Billetterie</a></li>
+          <li><a class="nav__link" href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <!-- Bascule de thème CSS-only : voir tokens.css (:root:has(#theme-dark:checked)) -->
+      <fieldset class="theme-switch">
+        <legend class="u-visually-hidden">Thème de couleur</legend>
+        <label class="theme-switch__option">
+          <input class="u-visually-hidden" type="radio" name="theme" id="theme-auto" value="auto" checked>
+          Auto
+        </label>
+        <label class="theme-switch__option">
+          <input class="u-visually-hidden" type="radio" name="theme" id="theme-light" value="light">
+          Clair
+        </label>
+        <label class="theme-switch__option">
+          <input class="u-visually-hidden" type="radio" name="theme" id="theme-dark" value="dark">
+          Sombre
+        </label>
+      </fieldset>
+    </div>
   </header>
 
-  <main id="top">
+  <main id="contenu">
 
-    <!-- ============================================================
-         HERO : le SEUL <h1> de la page, date(s), lieu, accroche,
-         appel à l'action vers #billetterie.
-         Idées : grid-template-areas, @keyframes d'apparition (pensez
-         à prefers-reduced-motion), titre en clamp().
-         ============================================================ -->
+    <!-- ============================== HERO ============================== -->
     <section class="hero" aria-labelledby="hero-titre">
-      <h1 id="hero-titre">NOM DE L'ÉVÉNEMENT</h1>
-      <!-- TODO : <p> date + lieu (élément <time datetime="…">), accroche -->
-      <a href="#billetterie" class="btn">Réserver ma place</a>
+      <div class="container hero__inner">
+        <div class="hero__intro">
+          <p class="hero__kicker">Conférence CSS · 2e édition</p>
+          <h1 id="hero-titre">Baseline <span class="hero__title-accent">Conf</span></h1>
+          <p class="hero__meta">
+            <time datetime="2027-03-18">18</time> &amp; <time datetime="2027-03-19">19 mars 2027</time>
+            · Halle des Rotatives, Lyon
+          </p>
+          <p class="hero__pitch">Deux jours pour écrire un CSS qui tient dans la durée : cascade, design tokens, mises en page robustes et accessibilité.</p>
+          <div class="hero__actions">
+            <a href="#billetterie" class="btn">Réserver ma place</a>
+            <a href="#programme" class="btn btn--ghost">Voir le programme</a>
+          </div>
+        </div>
+
+        <ul class="hero__facts" role="list">
+          <li><strong>2</strong> jours</li>
+          <li><strong>2</strong> salles</li>
+          <li><strong>10</strong> sessions</li>
+          <li><strong>450</strong> places</li>
+        </ul>
+
+        <!-- Visuel purement décoratif (aria-hidden) : les mêmes informations sont dans le texte -->
+        <figure class="hero__visual code-window" aria-hidden="true">
+          <div class="code-window__bar">
+            <span class="code-window__dot"></span>
+            <span class="code-window__dot"></span>
+            <span class="code-window__dot"></span>
+          </div>
+<pre class="code-window__code"><code><span class="code-window__comment">/* Lyon · 18 → 19 mars 2027 */</span>
+<span class="code-window__selector">@layer</span> conf {
+  <span class="code-window__selector">.baseline</span> {
+    <span class="code-window__property">--jours</span>: <span class="code-window__value">2</span>;
+    <span class="code-window__property">--salles</span>: <span class="code-window__value">grille flex</span>;
+    <span class="code-window__property">--sessions</span>: <span class="code-window__value">10</span>;
+    <span class="code-window__property">--cafe</span>: <span class="code-window__value">illimité</span>;
+  }
+}</code></pre>
+        </figure>
+      </div>
     </section>
 
-    <!-- ============================================================
-         PROGRAMME EN GRILLE : ≥ 6 créneaux, sur 2 jours ou 2 scènes.
-         Exigence 2 : grid-template-areas (exemple fourni dans
-         layout.css : zones "titre", "jour1", "jour2") et/ou subgrid.
-         Chaque créneau : <time>, titre, lieu/scène.
-         ============================================================ -->
-    <section id="programme" class="section programme" aria-labelledby="programme-titre">
-      <h2 id="programme-titre">Programme</h2>
-      <!-- TODO : jour 1 (grid-area: jour1) : <h3> + liste de créneaux -->
-      <!-- TODO : jour 2 (grid-area: jour2) : <h3> + liste de créneaux -->
+    <!-- ============================ PROGRAMME ============================ -->
+    <section id="programme" class="section" aria-labelledby="programme-titre">
+      <div class="container programme">
+        <div class="section-head">
+          <p class="section-head__kicker">01 — Deux jours, deux salles</p>
+          <h2 id="programme-titre">Programme</h2>
+          <p class="section-head__lead">Talks de 45 minutes en salle Grille, ateliers pratiques en salle Flex (30 places, sur inscription).</p>
+        </div>
+
+        <div class="day programme__jour1">
+          <h3 class="day__title">Jour 1 <span class="day__date"><time datetime="2027-03-18">jeudi 18 mars</time></span></h3>
+          <ol class="day__slots" role="list">
+            <li class="slot slot--break">
+              <time class="slot__time" datetime="2027-03-18T08:45">08:45</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Accueil, badges et café</h4>
+              </div>
+              <p class="slot__room">Hall</p>
+            </li>
+            <li class="slot" id="talk-garnier">
+              <time class="slot__time" datetime="2027-03-18T09:30">09:30</time>
+              <div class="slot__body">
+                <h4 class="slot__title"><span class="slot__tag">Keynote</span>Les layers en production : 18 mois sans !important</h4>
+                <p class="slot__speaker">Inès Garnier</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+            <li class="slot" id="talk-benali">
+              <time class="slot__time" datetime="2027-03-18T10:45">10:45</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Des tokens au thème sombre en une après-midi</h4>
+                <p class="slot__speaker">Malik Benali</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+            <li class="slot">
+              <time class="slot__time" datetime="2027-03-18T10:45">10:45</time>
+              <div class="slot__body">
+                <h4 class="slot__title"><span class="slot__tag">Atelier</span>Migrer un projet Sass vers le nesting natif</h4>
+                <p class="slot__speaker">Théo Lambert</p>
+              </div>
+              <p class="slot__room">Salle Flex</p>
+            </li>
+            <li class="slot slot--break">
+              <time class="slot__time" datetime="2027-03-18T12:15">12:15</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Déjeuner</h4>
+              </div>
+              <p class="slot__room">Hall</p>
+            </li>
+            <li class="slot" id="talk-marchetti">
+              <time class="slot__time" datetime="2027-03-18T14:00">14:00</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Focus visible : concevoir le parcours clavier d'abord</h4>
+                <p class="slot__speaker">Sofia Marchetti</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+            <li class="slot">
+              <time class="slot__time" datetime="2027-03-18T16:00">16:00</time>
+              <div class="slot__body">
+                <h4 class="slot__title"><span class="slot__tag">Table ronde</span>Maintenir un CSS pendant dix ans</h4>
+                <p class="slot__speaker">Inès Garnier, Malik Benali, Hugo Perrin</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+          </ol>
+        </div>
+
+        <div class="day programme__jour2">
+          <h3 class="day__title">Jour 2 <span class="day__date"><time datetime="2027-03-19">vendredi 19 mars</time></span></h3>
+          <ol class="day__slots" role="list">
+            <li class="slot slot--break">
+              <time class="slot__time" datetime="2027-03-19T09:00">09:00</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Café d'accueil</h4>
+              </div>
+              <p class="slot__room">Hall</p>
+            </li>
+            <li class="slot" id="talk-lambert">
+              <time class="slot__time" datetime="2027-03-19T09:30">09:30</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Container queries : des composants qui se placent seuls</h4>
+                <p class="slot__speaker">Théo Lambert</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+            <li class="slot" id="talk-diallo">
+              <time class="slot__time" datetime="2027-03-19T11:00">11:00</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Animer sans donner le mal de mer</h4>
+                <p class="slot__speaker">Aïcha Diallo</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+            <li class="slot slot--break">
+              <time class="slot__time" datetime="2027-03-19T12:15">12:15</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Déjeuner</h4>
+              </div>
+              <p class="slot__room">Hall</p>
+            </li>
+            <li class="slot" id="talk-perrin">
+              <time class="slot__time" datetime="2027-03-19T14:00">14:00</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Subgrid : la fin des hauteurs magiques</h4>
+                <p class="slot__speaker">Hugo Perrin</p>
+              </div>
+              <p class="slot__room">Salle Grille</p>
+            </li>
+            <li class="slot">
+              <time class="slot__time" datetime="2027-03-19T15:30">15:30</time>
+              <div class="slot__body">
+                <h4 class="slot__title"><span class="slot__tag">Atelier</span>Auditer l'accessibilité d'un site en 45 minutes</h4>
+                <p class="slot__speaker">Sofia Marchetti et Aïcha Diallo</p>
+              </div>
+              <p class="slot__room">Salle Flex</p>
+            </li>
+            <li class="slot">
+              <time class="slot__time" datetime="2027-03-19T17:00">17:00</time>
+              <div class="slot__body">
+                <h4 class="slot__title">Clôture et apéro sur le toit</h4>
+                <p class="slot__speaker">Toute l'équipe Baseline</p>
+              </div>
+              <p class="slot__room">Terrasse</p>
+            </li>
+          </ol>
+        </div>
+      </div>
     </section>
 
-    <!-- ============================================================
-         INTERVENANTS / ARTISTES EN CARTES : ≥ 6 cartes.
-         Carte = <article> : image (alt pertinent !), nom (<h3>), rôle,
-         bio, lien. Exigence 2 : subgrid pour aligner les contenus.
-         Exigence 3 : composant piloté par container query, utilisé
-         dans DEUX contextes de largeurs différentes.
-         ============================================================ -->
-    <section id="intervenants" class="section speakers" aria-labelledby="intervenants-titre">
-      <h2 id="intervenants-titre">Intervenants</h2>
-      <!-- TODO : <ul role="list"> de <li><article class="card">…</article></li> -->
+    <!-- =========================== INTERVENANTS =========================== -->
+    <section id="intervenants" class="section section--alt" aria-labelledby="intervenants-titre">
+      <div class="container">
+        <div class="section-head">
+          <p class="section-head__kicker">02 — Six voix du CSS</p>
+          <h2 id="intervenants-titre">Intervenants</h2>
+          <p class="section-head__lead">Des praticiennes et praticiens qui maintiennent du CSS en production, pas des démos.</p>
+        </div>
+
+        <ul class="speakers__grid" role="list">
+          <li class="speakers__item">
+            <article class="card">
+              <img class="card__media" src="img/ines-garnier.svg" width="400" height="300" loading="lazy"
+                   alt="Portrait illustré d'Inès Garnier, cheveux courts bruns, sur fond bleu avec le mot @layer.">
+              <div class="card__header">
+                <h3 class="card__name">Inès Garnier</h3>
+                <p class="card__role">Lead front-end, Atelier Nord</p>
+              </div>
+              <p class="card__bio">Elle a migré un design system de 40 000 lignes vers les cascade layers, et ne regarde plus jamais en arrière.</p>
+              <a class="card__link" href="#talk-garnier">Voir le talk<span class="u-visually-hidden"> d'Inès Garnier</span></a>
+            </article>
+          </li>
+          <li class="speakers__item">
+            <article class="card">
+              <img class="card__media" src="img/malik-benali.svg" width="400" height="300" loading="lazy"
+                   alt="Portrait illustré de Malik Benali, barbe noire, sur fond bleu nuit avec une cible corail.">
+              <div class="card__header">
+                <h3 class="card__name">Malik Benali</h3>
+                <p class="card__role">Designer de systèmes</p>
+              </div>
+              <p class="card__bio">Passionné de tokens, il fait le pont entre la maquette et le code depuis dix ans. Il anime chaque mois le podcast « Variables globales », où une équipe produit raconte comment elle nomme ses couleurs.</p>
+              <a class="card__link" href="#talk-benali">Voir le talk<span class="u-visually-hidden"> de Malik Benali</span></a>
+            </article>
+          </li>
+          <li class="speakers__item">
+            <article class="card">
+              <img class="card__media" src="img/sofia-marchetti.svg" width="400" height="300" loading="lazy"
+                   alt="Portrait illustré de Sofia Marchetti, cheveux longs auburn, sur fond vert citron avec un cadre de focus en pointillés.">
+              <div class="card__header">
+                <h3 class="card__name">Sofia Marchetti</h3>
+                <p class="card__role">Experte accessibilité numérique</p>
+              </div>
+              <p class="card__bio">Auditrice RGAA, elle teste chaque interface au clavier avant même de l'ouvrir à la souris.</p>
+              <a class="card__link" href="#talk-marchetti">Voir le talk<span class="u-visually-hidden"> de Sofia Marchetti</span></a>
+            </article>
+          </li>
+          <li class="speakers__item">
+            <article class="card">
+              <img class="card__media" src="img/theo-lambert.svg" width="400" height="300" loading="lazy"
+                   alt="Portrait illustré de Théo Lambert, cheveux blonds en épis, sur fond corail avec un petit écran.">
+              <div class="card__header">
+                <h3 class="card__name">Théo Lambert</h3>
+                <p class="card__role">Intégrateur indépendant</p>
+              </div>
+              <p class="card__bio">Il construit des composants qui s'adaptent à leur conteneur plutôt qu'à l'écran, et en a tiré un livre de recettes libre.</p>
+              <a class="card__link" href="#talk-lambert">Voir le talk<span class="u-visually-hidden"> de Théo Lambert</span></a>
+            </article>
+          </li>
+          <li class="speakers__item">
+            <article class="card">
+              <img class="card__media" src="img/aicha-diallo.svg" width="400" height="300" loading="lazy"
+                   alt="Portrait illustré d'Aïcha Diallo, bandeau jaune dans les cheveux, sur fond violet avec des vagues.">
+              <div class="card__header">
+                <h3 class="card__name">Aïcha Diallo</h3>
+                <p class="card__role">Lead UX motion</p>
+              </div>
+              <p class="card__bio">Ancienne animatrice 2D, elle conçoit des animations qui guident sans étourdir, et part toujours de prefers-reduced-motion.</p>
+              <a class="card__link" href="#talk-diallo">Voir le talk<span class="u-visually-hidden"> d'Aïcha Diallo</span></a>
+            </article>
+          </li>
+          <li class="speakers__item">
+            <article class="card">
+              <img class="card__media" src="img/hugo-perrin.svg" width="400" height="300" loading="lazy"
+                   alt="Portrait illustré d'Hugo Perrin, lunettes rondes, sur fond vert sapin avec des blocs de grille.">
+              <div class="card__header">
+                <h3 class="card__name">Hugo Perrin</h3>
+                <p class="card__role">Ingénieur performance web</p>
+              </div>
+              <p class="card__bio">Il traque les recalculs de mise en page inutiles et les hauteurs fixées au pixel près.</p>
+              <a class="card__link" href="#talk-perrin">Voir le talk<span class="u-visually-hidden"> d'Hugo Perrin</span></a>
+            </article>
+          </li>
+        </ul>
+      </div>
     </section>
 
-    <!-- ============================================================
-         BILLETTERIE : ≥ 3 offres (prix, contenu, bouton), une offre
-         mise en avant. Exigence 4 : idéal pour :has(), ex.
-         .offer:has(.offer__badge) { … }
-         ============================================================ -->
+    <!-- =========================== BILLETTERIE =========================== -->
     <section id="billetterie" class="section" aria-labelledby="billetterie-titre">
-      <h2 id="billetterie-titre">Billetterie</h2>
-      <!-- TODO : liste d'offres -->
+      <div class="container">
+        <div class="section-head">
+          <p class="section-head__kicker">03 — 450 places</p>
+          <h2 id="billetterie-titre">Billetterie</h2>
+          <p class="section-head__lead">Tous les pass incluent les pauses café, le déjeuner et l'accès aux vidéos des talks.</p>
+        </div>
+
+        <ul class="tickets__grid" role="list">
+          <li class="tickets__item">
+            <article class="offer">
+              <h3 class="offer__name">Pass 1 jour</h3>
+              <p class="offer__price"><span class="offer__amount">189 €</span> TTC</p>
+              <ul class="offer__features" role="list">
+                <li class="offer__feature">Toutes les sessions du jour choisi</li>
+                <li class="offer__feature">Déjeuner et pauses café</li>
+                <li class="offer__feature">Vidéos des talks sous-titrées</li>
+              </ul>
+              <a class="btn btn--ghost offer__cta" href="mailto:billetterie@baseline-conf.example?subject=Pass%201%20jour">Choisir le pass 1 jour</a>
+            </article>
+          </li>
+          <li class="tickets__item">
+            <!-- Le badge suffit à mettre l'offre en avant : .offer:has(.offer__badge) -->
+            <article class="offer">
+              <p class="offer__badge">Le plus choisi</p>
+              <h3 class="offer__name">Pass 2 jours</h3>
+              <p class="offer__price"><span class="offer__amount">299 €</span> TTC</p>
+              <ul class="offer__features" role="list">
+                <li class="offer__feature">Les deux journées complètes</li>
+                <li class="offer__feature">Déjeuners et pauses café</li>
+                <li class="offer__feature">Apéro de clôture sur le toit</li>
+                <li class="offer__feature">Vidéos des talks sous-titrées</li>
+              </ul>
+              <a class="btn btn--ghost offer__cta" href="mailto:billetterie@baseline-conf.example?subject=Pass%202%20jours">Choisir le pass 2 jours</a>
+            </article>
+          </li>
+          <li class="tickets__item">
+            <article class="offer">
+              <h3 class="offer__name">Pass 2 jours + atelier</h3>
+              <p class="offer__price"><span class="offer__amount">389 €</span> TTC</p>
+              <ul class="offer__features" role="list">
+                <li class="offer__feature">Tout le pass 2 jours</li>
+                <li class="offer__feature">Une place garantie dans un atelier</li>
+                <li class="offer__feature">Code et supports de l'atelier</li>
+              </ul>
+              <a class="btn btn--ghost offer__cta" href="mailto:billetterie@baseline-conf.example?subject=Pass%202%20jours%20%2B%20atelier">Choisir le pass avec atelier</a>
+            </article>
+          </li>
+        </ul>
+
+        <!-- 2e contexte du même composant .offer : un bandeau pleine largeur.
+             La container query le passe en disposition horizontale. -->
+        <div class="tickets__extra">
+          <article class="offer">
+            <h3 class="offer__name">Pass Étudiant &amp; demandeur d'emploi</h3>
+            <p class="offer__price"><span class="offer__amount">79 €</span> TTC, sur justificatif</p>
+            <ul class="offer__features" role="list">
+              <li class="offer__feature">Les deux journées complètes</li>
+              <li class="offer__feature">Déjeuners et pauses café</li>
+              <li class="offer__feature">60 places réservées</li>
+              <li class="offer__feature">Vidéos des talks sous-titrées</li>
+            </ul>
+            <a class="btn btn--ghost offer__cta" href="mailto:billetterie@baseline-conf.example?subject=Pass%20%C3%A9tudiant">Demander le tarif réduit</a>
+          </article>
+        </div>
+
+        <p class="tickets__note">Paiement sécurisé, facture au nom de votre entreprise sur demande. Billets transférables gratuitement jusqu'au 4 mars 2027.</p>
+      </div>
     </section>
 
-    <!-- ============================================================
-         FAQ : ≥ 5 questions en <details>/<summary> (pas de JS !).
-         Exigence 6 : une transition à l'ouverture est bienvenue.
-         ============================================================ -->
-    <section id="faq" class="section" aria-labelledby="faq-titre">
-      <h2 id="faq-titre">Questions fréquentes</h2>
-      <!-- TODO :
-      <details class="faq-item">
-        <summary>Question ?</summary>
-        <p>Réponse.</p>
-      </details>
-      -->
+    <!-- =============================== FAQ =============================== -->
+    <section id="faq" class="section section--alt" aria-labelledby="faq-titre">
+      <div class="container faq">
+        <div class="section-head">
+          <p class="section-head__kicker">04 — Bon à savoir</p>
+          <h2 id="faq-titre">Questions fréquentes</h2>
+          <p class="section-head__lead">Une autre question ? Écrivez-nous à <a href="mailto:bonjour@baseline-conf.example">bonjour@baseline-conf.example</a>.</p>
+        </div>
+
+        <div class="faq__list">
+          <details class="faq-item">
+            <summary class="faq-item__question">Le lieu est-il accessible en fauteuil roulant ?</summary>
+            <div class="faq-item__answer">
+              <p>Oui. La Halle des Rotatives est entièrement de plain-pied, la salle Grille est équipée d'une boucle magnétique et la keynote est interprétée en LSF.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-item__question">Les talks seront-ils enregistrés ?</summary>
+            <div class="faq-item__answer">
+              <p>Oui. Toutes les sessions de la salle Grille sont filmées, sous-titrées puis envoyées aux participants trois semaines après l'événement.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-item__question">Puis-je transférer ou revendre mon billet ?</summary>
+            <div class="faq-item__answer">
+              <p>Le transfert est gratuit jusqu'au 4 mars 2027 : envoyez le nom de la nouvelle personne à la billetterie. La revente à un prix supérieur au tarif officiel est interdite.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-item__question">Faut-il apporter un ordinateur pour les ateliers ?</summary>
+            <div class="faq-item__answer">
+              <p>Oui, avec un navigateur récent (Chrome, Edge ou Firefox) et un éditeur de code. Aucune installation supplémentaire n'est nécessaire.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-item__question">Comment venir à la Halle des Rotatives ?</summary>
+            <div class="faq-item__answer">
+              <p>Tram T1, arrêt « Rotatives », à 10 minutes de la gare Part-Dieu. Un parking vélo surveillé de 150 places est ouvert pendant les deux jours.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-item__question">Les repas conviennent-ils aux régimes particuliers ?</summary>
+            <div class="faq-item__answer">
+              <p>Le déjeuner est végétarien par défaut. Les options sans gluten ou vegan sont à préciser au moment de la réservation.</p>
+            </div>
+          </details>
+        </div>
+      </div>
     </section>
 
   </main>
 
-  <!-- ============================================================
-       FOOTER : contact, réseaux (fictifs), mention « événement
-       fictif — projet étudiant », crédits des images et polices.
-       ============================================================ -->
+  <!-- ============================== FOOTER ============================== -->
   <footer class="site-footer">
-    <p>Événement fictif — projet étudiant, module CSS avancé.</p>
-    <!-- TODO : contact, réseaux, crédits -->
-  </footer>
+    <div class="container site-footer__inner">
+      <div class="site-footer__col">
+        <a href="#top" class="logo"><span class="logo__mark" aria-hidden="true">{b}</span> Baseline Conf</a>
+        <p class="site-footer__tagline">La conférence du CSS qui dure. 2e édition, Lyon.</p>
+      </div>
 
-  <!-- JavaScript facultatif (≤ 20 lignes, justifié dans le README) :
-  <script src="js/main.js" defer></script>
-  -->
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Contact</h2>
+        <address class="site-footer__links">
+          <span>Halle des Rotatives, 12 quai des Imprimeurs, 69007 Lyon</span>
+          <a href="mailto:bonjour@baseline-conf.example">bonjour@baseline-conf.example</a>
+        </address>
+      </div>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Réseaux (fictifs)</h2>
+        <ul class="site-footer__links" role="list">
+          <li><a href="https://example.com/">Mastodon</a></li>
+          <li><a href="https://example.com/">Bluesky</a></li>
+          <li><a href="https://example.com/">LinkedIn</a></li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Crédits</h2>
+        <ul class="site-footer__links" role="list">
+          <li>Illustrations SVG : créées pour ce projet.</li>
+          <li>Polices : <a href="https://fonts.google.com/specimen/Space+Grotesk">Space Grotesk</a> (Florian Karsten) et <a href="https://fonts.google.com/specimen/JetBrains+Mono">JetBrains Mono</a> (JetBrains), licence SIL Open Font License, via Google Fonts.</li>
+        </ul>
+      </div>
+
+      <p class="site-footer__bottom">Événement fictif — projet étudiant, module CSS avancé.</p>
+    </div>
+  </footer>
 </body>
 </html>
