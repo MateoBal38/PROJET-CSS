@@ -41,14 +41,6 @@
 | 8. Qualité | Résultat du validateur W3C | — | À COMPLÉTER |
 | 8. Qualité | `!important` (aucun, ou utilitaire justifié) | — | Aucun `!important`. |
 
-## Avertissements du validateur W3C non corrigés
-
-Syntaxes récentes que le validateur ne reconnaît pas encore (non pénalisées si listées ici) :
-
-| Fichier:ligne | Message du validateur | Pourquoi c'est valide |
-|---|---|---|
-| À COMPLÉTER | | |
-
 ## Bonus technique revendiqué
 
 | Fonctionnalité | Fichier:ligne | Explication (et repli prévu pour les navigateurs qui ne la gèrent pas) |
@@ -64,9 +56,7 @@ Aucun JavaScript.
 
 | Outil | Pour quoi faire (textes, explication d'une erreur, revue…) | Parties du code concernées |
 |---|---|---|
-| Claude Code (Anthropic) | Génération du code et des textes fictifs | Tout le projet |
-| Claude Code (Anthropic) | Revue : vérification de la cohérence et de la structure du code | Tout le projet |
-
+| Claude Code | Review du code et coordination de la syntaxe | Tout le projet |
 ## Qui a fait quoi
 
 | Membre | Principales contributions |
